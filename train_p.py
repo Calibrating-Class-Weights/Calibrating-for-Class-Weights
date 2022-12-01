@@ -33,6 +33,8 @@ from vit_jax import input_pipeline
 from vit_jax import models
 from vit_jax import utils
 
+def test():
+  print('test')
 
 def make_update_fn(*, apply_fn, accum_steps, tx, w_c):
   """Returns update step for data parallel training."""
