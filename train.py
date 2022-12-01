@@ -34,9 +34,11 @@ from vit_jax import models
 from vit_jax import utils
 
 
-def make_update_fn(*, apply_fn, accum_steps, tx):
+def make_update_fn(*, apply_fn, accum_steps, tx, w_c):
   """Returns update step for data parallel training."""
-
+  
+  w_c=w_c
+  
   def update_fn(params, opt_state, batch, rng):
 
     _, new_rng = jax.random.split(rng)
@@ -44,18 +46,20 @@ def make_update_fn(*, apply_fn, accum_steps, tx):
     # Note: This is only used for multi-host training (i.e. multiple computers
     # each with multiple accelerators).
     dropout_rng = jax.random.fold_in(rng, jax.lax.axis_index('batch'))
-
-    def cross_entropy_loss(*, logits, labels):
+    
+    #w_c is weight of target class
+    def cross_entropy_loss(*, logits, labels, w_c):
       logp = jax.nn.log_softmax(logits)
-      return -jnp.mean(jnp.sum(logp * labels, axis=1))
+      w = jnp.array([w_c, (1-w_c), (1-w_c),(1-w_c), (1-w_c), (1-w_c), (1-w_c), (1-w_c), (1-w_c), (1-w_c)])
+      return -jnp.mean(jnp.sum(w * logp * labels, axis=1))
 
-    def loss_fn(params, images, labels):
+    def loss_fn(params, images, labels,w_c):
       logits = apply_fn(
           dict(params=params),
           rngs=dict(dropout=dropout_rng),
           inputs=images,
           train=True)
-      return cross_entropy_loss(logits=logits, labels=labels)
+      return cross_entropy_loss(logits=logits, labels=labels, w_c = w_c)
 
     l, g = utils.accumulate_gradient(
         jax.value_and_grad(loss_fn), params, batch['image'], batch['label'],
