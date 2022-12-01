@@ -61,7 +61,7 @@ def make_update_fn(*, apply_fn, accum_steps, tx, w_c):
           rngs=dict(dropout=dropout_rng),
           inputs=images,
           train=True)
-      return cross_entropy_loss(logits=logits, labels=labels, w_c = w_c)
+      return cross_entropy_loss(logits=logits, labels=labels)
 
     l, g = utils.accumulate_gradient(
         jax.value_and_grad(loss_fn), params, batch['image'], batch['label'],
