@@ -55,13 +55,13 @@ def make_update_fn(*, apply_fn, accum_steps, tx, w_c):
       w = jnp.array([w_c, (1-w_c), (1-w_c),(1-w_c), (1-w_c), (1-w_c), (1-w_c), (1-w_c), (1-w_c), (1-w_c)])
       return -jnp.mean(jnp.sum(w * logp * labels, axis=1))
 
-    def loss_fn(params, images, labels,w_c):
+    def loss_fn(params, images, labels):
       logits = apply_fn(
           dict(params=params),
           rngs=dict(dropout=dropout_rng),
           inputs=images,
           train=True)
-      return cross_entropy_loss(logits=logits, labels=labels)
+      return cross_entropy_loss(logits=logits, labels=labels, w_c=w_c)
 
     l, g = utils.accumulate_gradient(
         jax.value_and_grad(loss_fn), params, batch['image'], batch['label'],
