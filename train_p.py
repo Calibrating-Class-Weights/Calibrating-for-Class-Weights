@@ -52,7 +52,7 @@ def make_update_fn(*, apply_fn, accum_steps, tx, w_c):
     #w_c is weight of target class
     def cross_entropy_loss(*, logits, labels, w_c):
       logp = jax.nn.log_softmax(logits)
-      w = jnp.array([w_c, (1-w_c), (1-w_c),(1-w_c), (1-w_c), (1-w_c), (1-w_c), (1-w_c), (1-w_c), (1-w_c)])
+      w = jnp.array([((1-w_c), (1-w_c), (1-w_c),(1-w_c), (1-w_c), (w_c), (1-w_c), (1-w_c), (1-w_c), (1-w_c)])
       return -jnp.mean(jnp.sum(w * logp * labels, axis=1))
 
     def loss_fn(params, images, labels):
