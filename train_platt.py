@@ -18,7 +18,7 @@ from vit_jax import checkpoint
 from vit_jax import input_pipeline
 from vit_jax import models
 from vit_jax import utils
-import numpy as np
+import math
 
 def test():
   print('test')
@@ -40,7 +40,7 @@ def make_update_fn(*, apply_fn, accum_steps, tx, w_c):
     def cross_entropy_loss(*, logits, labels, w_c):
       A = 0.5321582130941984
       B = -2.114779504084133
-      logits = 1/(1+np.exp(A*logits+B))
+      logits = 1/(1+math.exp(A*logits+B))
       logp = jax.nn.log_softmax(logits)
       w = jnp.array([(1-w_c), (1-w_c), (1-w_c),(1-w_c), (1-w_c), (w_c), (1-w_c), (1-w_c), (1-w_c), (1-w_c)])
       return -jnp.mean(jnp.sum(w * logp * labels, axis=1))
