@@ -22,10 +22,12 @@ from vit_jax import utils
 def test():
   print('test')
 
-def make_update_fn(*, apply_fn, accum_steps, tx, w_c):
+def make_update_fn(*, apply_fn, accum_steps, tx, w_c, A, B):
   """Returns update step for data parallel training."""
   
   w_c=w_c
+  A = A
+  B = B
   
   def update_fn(params, opt_state, batch, rng):
 
@@ -36,9 +38,7 @@ def make_update_fn(*, apply_fn, accum_steps, tx, w_c):
     dropout_rng = jax.random.fold_in(rng, jax.lax.axis_index('batch'))
     
     #w_c is weight of target class
-    def cross_entropy_loss(*, logits, labels, w_c):
-      A = 0.5321582130941984
-      B = -2.114779504084133
+    def cross_entropy_loss(*, logits, labels, w_c, A, B):
       logits = 1/(1+jax.numpy.exp(A*logits+B))
       logp = jax.nn.log_softmax(logits)
       w = jnp.array([(1-w_c), (1-w_c), (1-w_c),(1-w_c), (1-w_c), (w_c), (1-w_c), (1-w_c), (1-w_c), (1-w_c)])
@@ -50,7 +50,7 @@ def make_update_fn(*, apply_fn, accum_steps, tx, w_c):
           rngs=dict(dropout=dropout_rng),
           inputs=images,
           train=True)
-      return cross_entropy_loss(logits=logits, labels=labels, w_c=w_c)
+      return cross_entropy_loss(logits=logits, labels=labels, w_c=w_c, A = A, B = B)
 
     l, g = utils.accumulate_gradient(
         jax.value_and_grad(loss_fn), params, batch['image'], batch['label'],
