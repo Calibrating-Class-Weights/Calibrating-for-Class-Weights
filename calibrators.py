@@ -1,7 +1,6 @@
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.base import BaseEstimator
-from utils import create_binned_data, get_bin_boundaries
 import os
 import math
 import pandas as pd
