@@ -466,7 +466,7 @@ class TempCalibrator(BaseEstimator):
         return output
 
     def _transform(self, y_prob: np.ndarray) -> np.ndarray:
-        output = y_prob * self.coef_[0]
+        output = y_prob/self.coef_[0]
         output = 1 / (1 + np.exp(-output))
         return output
 
