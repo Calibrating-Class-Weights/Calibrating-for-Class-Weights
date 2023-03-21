@@ -26,3 +26,25 @@ corrected = [0.0033396202603427844, 0.0028694713906138127, 0.005100238632243007]
 Optimal Temp for w=0.9: 1.2114897966384888
 Optimal Platt for w=0.9: A= 0.5321582130941984, B= -2.114779504084133
 
+
+
+3-21
+#weight_1_optimal_temp = 1.81 #based on test
+#weight_1_optimal_temp = 1.65 #based on val on ECE loss
+#weight_1_optimal_temp = 1/-1.25018589
+#weight_1_optimal_A = 0.69 #based on val on ECE loss
+#weight_1_optimal_B = 0.6 #based on val on ECE loss
+#weight_1_optimal_A = 1.31652117 #based on val, logistic regression
+#weight_1_optimal_B = -5.56260916 #based on val, logistic regression
+
+#weight_2_optimal_temp = 2.41 #based on test
+#weight_2_optimal_temp = 4 #based on val
+#weight_2_optimal_A = 0.48 #based on val
+#weight_2_optimal_B = 0.5 #based on val
+
+#weight_3_optimal_temp = 10 #based on test
+#weight_3_optimal_temp = 30 #based on val for lowest ECE
+#weight_3_optimal_temp = 10 #use this for calibration curves
+#weight_3_optimal_A = 0.0001
+#weight_3_optimal_B = 0.7
+
