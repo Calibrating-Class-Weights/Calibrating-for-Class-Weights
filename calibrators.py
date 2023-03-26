@@ -379,7 +379,7 @@ class cLogCalibrator(BaseEstimator):
         return output
 
     def _transform(self, y_prob: np.ndarray) -> np.ndarray:
-        output = y_prob * self.coef_[0] + self.intercept_
+        output = y_prob * self.coef_ + self.intercept_
         output = 1 / (1 + np.exp(-output))
         return output
 
@@ -401,16 +401,20 @@ class cLogCalibrator(BaseEstimator):
             y_prob = self._convert_to_log_odds(y_prob)
 
         # the class expects 2d ndarray as input features
-        A = np.zeros((y_prob.reshape(-1, 1).shape[1]+1))
-        A[0, :2] = np.array([1, logit(self.weight)])
-        lb = np.array([0])
-        ub = np.array([0])
+        scores = y_prob.reshape(-1, 1)
+        ones = np.ones((scores.shape[0],1))
+        combined = np.hstack((ones,scores))
+        A = np.zeros((1, combined.shape[1]))
+        A[0][0] = 1
+        A[0][1] = logit(self.weight)
+        lb = np.array([0.0])
+        ub = np.array([0.0])
         bounds = Bounds(lb, ub)
-        lc = LinearConstraint(A, 0, 0)
-        clog = clogistic(solver="ecos", penalty="elasticnet", bounds=bounds, constraints=lc)
-        clog.fit(y_prob.reshape(-1, 1), y_true)
-        self.coef_ = clog.coef_[0]
-        self.intercept_ = clog.intercept_
+        lc = LinearConstraint(A, lb, ub)
+        clog = clogistic(solver="ecos", penalty="elasticnet", fit_intercept = False, l1_ratio=0.5)
+        clog.fit(combined, y_true, constraints=lc)
+        self.intercept_ = clog.coef_[0][0]
+        self.coef_ = clog.coef_[0][1]
 
         y_calibrated_prob = self._transform(y_prob)
         return y_calibrated_prob
